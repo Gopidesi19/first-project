@@ -2,63 +2,61 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven-3.9'     // Configure in Jenkins Global Tool
-        jdk 'JDK-17'          // Configure in Jenkins Global Tool
+        jdk 'JDK-17'
+        maven 'Maven-3-9'
     }
 
     environment {
-        APP_NAME = "java-maven-app"
+        APP_NAME = "springboot-demo"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo "Checking out source code..."
+                echo "Stage 1: Checkout from GitHub"
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building the application..."
+                echo "Stage 2: Compile Application"
                 sh 'mvn clean compile'
             }
         }
 
-        stage('Unit Test') {
+        stage('Test') {
             steps {
-                echo "Running unit tests..."
+                echo "Stage 3: Run Unit Tests"
                 sh 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                echo "Packaging the application..."
+                echo "Stage 4: Package Application"
                 sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('Verify Artifact') {
             steps {
-                echo "Archiving JAR file..."
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                echo "Stage 5: Verify JAR file"
+                sh 'ls -l target/'
             }
         }
     }
 
     post {
         success {
-            echo "Build completed successfully 🎉"
+            echo "Pipeline Completed Successfully 🎉"
         }
-
         failure {
-            echo "Build failed ❌"
+            echo "Pipeline Failed ❌"
         }
-
         always {
-            echo "Pipeline execution finished."
+            echo "Build Finished."
         }
     }
 }
