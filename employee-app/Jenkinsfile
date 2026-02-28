@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3.9'     // Configure in Jenkins Global Tool
+        jdk 'JDK-17'          // Configure in Jenkins Global Tool
+    }
+
+    environment {
+        APP_NAME = "java-maven-app"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the application..."
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                echo "Running unit tests..."
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "Packaging the application..."
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                echo "Archiving JAR file..."
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build completed successfully 🎉"
+        }
+
+        failure {
+            echo "Build failed ❌"
+        }
+
+        always {
+            echo "Pipeline execution finished."
+        }
+    }
+}
